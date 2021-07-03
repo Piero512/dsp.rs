@@ -10,6 +10,7 @@ pub mod signal;
 pub mod spectrum;
 pub mod window;
 mod vector;
+mod ffi;
 
 pub use num_complex;
 use crate::num_complex::Complex32;

@@ -6,7 +6,7 @@ use crate::RealBuffer;
 
 
 /// Multiply vectors element wise
-pub fn multiply<T>(xs: &Vec<T>, ys: &Vec<T>, output: &mut Vec<T>) 
+pub fn multiply<T>(xs: &[T], ys: &[T], output: &mut [T]) 
 where
     T: Mul<Output = T> + Copy
 {
