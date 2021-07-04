@@ -15,7 +15,7 @@ fn main() {
     let samples: Vec<f32> = reader.samples().map(Result::unwrap).collect();
     let num_frames: usize = samples.len() / FRAME_SIZE;
     let mut fft = fft::ForwardFFT::new(FRAME_SIZE);
-
+    println!("Number of frames: {}", num_frames);
     (0..num_frames)
         .map(|i| &samples[(i*FRAME_SIZE)..((i+1)*FRAME_SIZE)])
         .map(|f| Signal::new(f.to_vec(), SAMPLE_RATE))

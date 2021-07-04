@@ -60,7 +60,23 @@ typedef struct {
 } slice_ref_float_t;
 
 /** \brief
- *  Same as [`Vec<T>`][`rust::Vec`], but with guaranteed `#[repr(C)]` layout
+ *  `&'lt mut [T]` but with a guaranteed `#[repr(C)]` layout.
+ * 
+ *  # C layout (for some given type T)
+ * 
+ *  ```c
+ *  typedef struct {
+ *      // Cannot be NULL
+ *      T * ptr;
+ *      size_t len;
+ *  } slice_T;
+ *  ```
+ * 
+ *  # Nullable pointer?
+ * 
+ *  If you want to support the above typedef, but where the `ptr` field is
+ *  allowed to be `NULL` (with the contents of `len` then being undefined)
+ *  use the `Option< slice_ptr<_> >` type.
  */
 typedef struct {
 
@@ -68,38 +84,72 @@ typedef struct {
 
     size_t len;
 
-    size_t cap;
+} slice_mut_float_t;
 
-} Vec_float_t;
+
+#include <stdbool.h>
 
 /** \brief
  *  Calculate a real-valued FFT and return the values on 
  */
-Vec_float_t dsprs_forward_fft_process_real (
+bool dsprs_forward_fft_process_real (
     ForwardFFTHandle_t * fft,
-    slice_ref_float_t input);
+    slice_ref_float_t input,
+    slice_mut_float_t output);
 
 typedef struct SignalHandle SignalHandle_t;
 
+/** \brief
+ *  New signal from data
+ *  Params:
+ *  * data: a struct containing a pointer to floats, with their length.
+ *  * sample_rate: the sample rate of the sound sent.
+ */
 SignalHandle_t * dsprs_signal_new (
     slice_ref_float_t data,
     size_t sample_rate);
 
+/** \brief
+ *  Create an empty signal
+ *  Params:
+ *  * sample_rate: the sample rate of the signal
+ */
 SignalHandle_t * dsprs_signal_empty (
     uint64_t sample_rate);
 
+/** \brief
+ *  Free a signal
+ *  Params:
+ *  * to_free: Ptr from Rust with a signal.
+ */
 void dsprs_signal_free (
     SignalHandle_t * to_free);
 
+/** \brief
+ *  Re-scale a signal 
+ *  * signal: ptr to created signal
+ *  * amount: float to scale the signal to.
+ */
 SignalHandle_t * dsprs_signal_rescale (
     SignalHandle_t const * signal,
     float amount);
 
+/** \brief
+ *  Create a new Forward FFT planner
+ *  Params:
+ *  * fft_size: size of the FFT to plan.
+ */
 ForwardFFTHandle_t * dsprs_forward_fft_new (
-    uint64_t sample_size);
+    uint64_t fft_size);
 
 typedef struct SpectrumHandle SpectrumHandle_t;
 
+/** \brief
+ *  Process an FFT with a signal
+ *  Params:
+ *  * fft: Ptr to previously created Forward FFT planer
+ *  * signal: Ptr to previously created signal
+ */
 SpectrumHandle_t * dsprs_forward_fft_process (
     ForwardFFTHandle_t * fft,
     SignalHandle_t const * signal);
@@ -164,41 +214,50 @@ WindowHandle_t * dsprs_blackman_window (
     uint64_t window_length);
 
 /** \brief
- *  `&'lt mut [T]` but with a guaranteed `#[repr(C)]` layout.
- * 
- *  # C layout (for some given type T)
- * 
- *  ```c
- *  typedef struct {
- *      // Cannot be NULL
- *      T * ptr;
- *      size_t len;
- *  } slice_T;
- *  ```
- * 
- *  # Nullable pointer?
- * 
- *  If you want to support the above typedef, but where the `ptr` field is
- *  allowed to be `NULL` (with the contents of `len` then being undefined)
- *  use the `Option< slice_ptr<_> >` type.
- */
-typedef struct {
-
-    float * ptr;
-
-    size_t len;
-
-} slice_mut_float_t;
-
-
-#include <stdbool.h>
-
-/** \brief
  *  Apply the window to the sample data
  */
 bool dsprs_window_apply (
     WindowHandle_t const * window,
     slice_ref_float_t input,
+    slice_mut_float_t output);
+
+/** \brief
+ *  Get the frequency of the fft component at index
+ *  Params:
+ *  * spectrum: ptr to the already created spectrum. 
+ *  * index: Index of the FFT. Keep in mind that the calculation is ciclycal.
+ *  Returns:
+ *  Frequency in Hertz as a float if spectrum is not null, otherwise -1.0 
+ */
+float dsprs_spectrum_item_freq (
+    SpectrumHandle_t const * spectrum,
+    uint64_t index);
+
+/** \brief
+ *  Returns the maximum frequency in the spectrum
+ *  Params:
+ *  * spectrum: ptr to the already created spectrum. 
+ *  Returns:
+ *  Max freq in Hertz as a float if spectrum is not null, otherwise -1.0 
+ */
+float dsprs_spectrum_max_freq (
+    SpectrumHandle_t const * spectrum);
+
+/** \brief
+ *  Returns the length of the spectrum data
+ *  Params:
+ *  * spectrum: ptr to the already created spectrum. 
+ *  Returns:
+ *  length of data (truncated to i64) if spectrum is not null, otherwise -1.0 
+ */
+int64_t dsprs_spectrum_len (
+    SpectrumHandle_t const * handle);
+
+/** \brief
+ *  Returns the spectrum into a real valued array.
+ */
+bool dsprs_spectrum_to_real (
+    SpectrumHandle_t const * handle,
     slice_mut_float_t output);
 
 

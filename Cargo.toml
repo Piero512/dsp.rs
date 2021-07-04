@@ -9,7 +9,6 @@ repository = "https://github.com/klangner/dsp"
 homepage = "https://github.com/klangner/dsp"
 documentation = "https://docs.rs/dsp"
 edition = "2018"
-autoexamples = false
 
 [lib]
 crate-type = ["rlib","cdylib", "staticlib"]
@@ -23,13 +22,14 @@ itertools = "0.8"
 num-complex = "0.2"
 rustfft = "3"
 rand = "0.6"
+audrey = "0.3"
 safer-ffi = { version = "0.0.6", features = ["proc_macros"] }
 
 [dev-dependencies]
 assert_approx_eq = "1.1.0"
 gnuplot = "0.0.31"
 clap = "2"
-audrey = "0.3"
+
 lewton = "0.9.4"
 criterion = "0.2"
 transpose = "0.2.0"
