@@ -12,7 +12,7 @@ edition = "2018"
 autoexamples = false
 
 [lib]
-crate-type = ["rlib","cdylib"]
+crate-type = ["rlib","cdylib", "staticlib"]
 
 [features]
 c-headers = ["safer-ffi/headers"]
