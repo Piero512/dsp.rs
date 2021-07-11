@@ -1,3 +1,6 @@
+use std::fs::File;
+use std::io::Seek;
+use std::io::Read;
 use crate::window::Window;
 use crate::window;
 use crate::signal::Signal;
@@ -225,6 +228,11 @@ pub extern fn dsprs_spectrum_len(handle:Option<&SpectrumHandle>) -> i64 {
 }
 
 /// Returns the spectrum into a real valued array.
+/// Params:
+/// * spectrum: ptr to the already created spectrum. 
+/// * output: ptr to slice struct 
+/// Returns:
+/// true if copy was successful, false otherwise
 #[ffi_export]
 pub extern fn dsprs_spectrum_to_real(handle: Option<&SpectrumHandle>, output: Option<c_slice::Mut<'_, f32>>) -> bool {
     if let Some(spectrum) = handle {
@@ -240,7 +248,6 @@ pub extern fn dsprs_spectrum_to_real(handle: Option<&SpectrumHandle>, output: Op
     }
     return false;
 }
-
 
 #[::safer_ffi::cfg_headers]
 #[test]
