@@ -159,7 +159,15 @@ pub extern fn dsprs_hamming_window(width: u64, offset: u64, window_length: u64) 
 pub extern fn dsprs_blackman_window(width: u64, offset: u64, window_length: u64) -> repr_c::Box::<WindowHandle> {
     repr_c::Box::new(WindowHandle {fwd: window::blackman(width as usize, offset as usize, window_length as usize)})
 }
-
+/// Check for Window length.
+/// If it's null, returns -1, otherwise the window size.
+#[ffi_export]
+pub extern fn dsprs_window_len(window: Option<&WindowHandle>) -> i64{
+    if let Some(w) = window {
+        return w.fwd.len() as i64;
+    }
+    return -1;
+}
 /// Apply the window to the sample data
 #[ffi_export]
 pub extern fn dsprs_window_apply(window:Option<&WindowHandle>, input :Option<c_slice::Ref<'_, f32>>, output: Option<c_slice::Mut<'_, f32>>) -> bool {

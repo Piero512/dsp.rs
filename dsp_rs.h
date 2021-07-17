@@ -214,6 +214,13 @@ WindowHandle_t * dsprs_blackman_window (
     uint64_t window_length);
 
 /** \brief
+ *  Check for Window length.
+ *  If it's null, returns -1, otherwise the window size.
+ */
+int64_t dsprs_window_len (
+    WindowHandle_t const * window);
+
+/** \brief
  *  Apply the window to the sample data
  */
 bool dsprs_window_apply (
@@ -255,6 +262,11 @@ int64_t dsprs_spectrum_len (
 
 /** \brief
  *  Returns the spectrum into a real valued array.
+ *  Params:
+ *  * spectrum: ptr to the already created spectrum. 
+ *  * output: ptr to slice struct 
+ *  Returns:
+ *  true if copy was successful, false otherwise
  */
 bool dsprs_spectrum_to_real (
     SpectrumHandle_t const * handle,

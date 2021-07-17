@@ -4,3 +4,4 @@ target
 *.lock
 temp/
 .DS_Store
+jniLibs
